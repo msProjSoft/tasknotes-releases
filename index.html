@@ -28,11 +28,6 @@
     ul { padding-left: 1.2rem; }
     a { color: #ffdca1; }
     code { font-family: ui-monospace, monospace; }
-    .versao-atual {
-      font-family: ui-monospace, monospace;
-      color: #ffb800;
-      font-weight: 700;
-    }
     .alternativa { font-size: 0.9rem; }
     .nota {
       border-left: 4px solid #94A3B8;
@@ -42,26 +37,29 @@
       font-size: 0.9rem;
       margin: 1.5rem 0;
     }
-    .versoes { margin-top: 2rem; font-size: 0.9rem; color: #d5c4ab; }
   </style>
 </head>
 <body>
   <h1>TaskNotes — Levantamento de Obra</h1>
   <p>
     Descarregue a versão mais recente da app para Android.
-    Versão atual: <span class="versao-atual">1.5.0</span>
   </p>
 
-  <!-- Query string de cache-busting: os browsers e o gestor de downloads do
-       Android cacheiam por URL, não por conteúdo. Sem o `?v=`, quem já
-       descarregou uma vez volta a receber o ficheiro antigo mesmo depois de o
-       servidor ter o novo. Atualizar o `?v=` a cada release. -->
-  <a class="botao" href="tasknotes-latest.apk?v=1.5.0">
-    Descarregar TaskNotes 1.5.0 (.apk)
+  <!-- Os .apk deixaram de viver neste repositório (2026-07-28): passaram a
+       assets de GitHub Releases, para cada versão não somar ~60 MB permanentes
+       ao histórico git. Consequência boa: estes dois links são **fixos** — o
+       `releases/latest/download/` resolve sempre para o asset da release mais
+       recente. Esta página deixa de precisar de alteração (e de Redeploy no
+       Coolify) a cada release; só se muda se mudar o texto/desenho.
+       Já não há `?v=` de cache-busting: o URL final para onde o GitHub
+       redireciona muda a cada release, o que resolve o mesmo problema. -->
+  <a class="botao"
+     href="https://github.com/msProjSoft/tasknotes-releases/releases/latest/download/tasknotes-latest.apk">
+    Descarregar TaskNotes (.apk)
   </a>
   <p class="alternativa">
-    Ou o ficheiro com a versão no nome, para garantir qual está a receber:
-    <a href="tasknotes-1.5.0.apk">tasknotes-1.5.0.apk</a>
+    Para ver o número de versão, as notas de cada release e versões anteriores:
+    <a href="https://github.com/msProjSoft/tasknotes-releases/releases">todas as versões</a>
   </p>
 
   <p>
@@ -77,15 +75,9 @@
     guardado em vez de ir buscar o novo.
   </div>
 
-  <div class="versoes">
-    <p>Versões anteriores:</p>
-    <!-- Só versões cujo .apk existe mesmo no repositório: os ficheiros
-         1.3.0 e 1.2.1 foram apagados para conter o tamanho do repo e os
-         links ficaram mortos. Ao apagar um .apk, remover a linha daqui. -->
-    <ul>
-      <li><a href="tasknotes-1.4.0.apk">1.4.0</a></li>
-      <li><a href="tasknotes-1.2.2.apk">1.2.2</a></li>
-    </ul>
-  </div>
+  <!-- A lista de versões anteriores era mantida à mão aqui e ficava
+       incoerente sempre que um .apk era apagado do repositório (aconteceu
+       com o 1.3.0 e o 1.2.1). Passou a ser a página de Releases do GitHub,
+       que se mantém sozinha — ver o link "todas as versões" acima. -->
 </body>
 </html>

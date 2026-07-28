@@ -1,0 +1,5 @@
+
+# Os .apk passaram a assets de GitHub Releases (2026-07-28) — deixaram de
+# ser versionados aqui para cada release nao somar ~60 MB ao historico git.
+# Ver o README/index.html: a rotina agora e `gh release create`.
+*.apk
