@@ -15,6 +15,7 @@
       line-height: 1.5;
     }
     h1 { color: #ffb800; font-size: 1.5rem; }
+    h2 { font-size: 1.1rem; margin-top: 2.5rem; }
     a.botao {
       display: inline-block;
       background: #ffb800;
@@ -37,30 +38,51 @@
       font-size: 0.9rem;
       margin: 1.5rem 0;
     }
+    /* Lista de versões, preenchida por JS a partir da API do GitHub. */
+    .versao {
+      border: 1px solid #514532;
+      background: #211b11;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .versao .num {
+      font-family: ui-monospace, monospace;
+      font-weight: 700;
+      color: #ffb800;
+    }
+    .versao .data { font-size: 0.85rem; color: #9e8f78; }
+    .versao .atual {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background: #ffb800;
+      color: #412d00;
+      border-radius: 12px;
+      padding: 0.15rem 0.5rem;
+    }
+    .versao .baixar { margin-left: auto; font-weight: 600; white-space: nowrap; }
+    .estado { color: #9e8f78; font-size: 0.9rem; }
   </style>
 </head>
 <body>
   <h1>TaskNotes — Levantamento de Obra</h1>
   <p>
-    Descarregue a versão mais recente da app para Android.
+    Descarregue a app para Android.
   </p>
 
-  <!-- Os .apk deixaram de viver neste repositório (2026-07-28): passaram a
-       assets de GitHub Releases, para cada versão não somar ~60 MB permanentes
-       ao histórico git. Consequência boa: estes dois links são **fixos** — o
-       `releases/latest/download/` resolve sempre para o asset da release mais
-       recente. Esta página deixa de precisar de alteração (e de Redeploy no
-       Coolify) a cada release; só se muda se mudar o texto/desenho.
-       Já não há `?v=` de cache-busting: o URL final para onde o GitHub
-       redireciona muda a cada release, o que resolve o mesmo problema. -->
+  <!-- Este botão é estático de propósito: `releases/latest/download/` é um URL
+       fixo que o GitHub resolve sempre para o asset da release mais recente.
+       Assim o download principal funciona mesmo que o JS abaixo falhe (sem
+       rede para a api.github.com, rate limit, browser antigo). -->
   <a class="botao"
      href="https://github.com/msProjSoft/tasknotes-releases/releases/latest/download/tasknotes-latest.apk">
-    Descarregar TaskNotes (.apk)
+    Descarregar a versão mais recente (.apk)
   </a>
-  <p class="alternativa">
-    Para ver o número de versão, as notas de cada release e versões anteriores:
-    <a href="https://github.com/msProjSoft/tasknotes-releases/releases">todas as versões</a>
-  </p>
 
   <p>
     No telemóvel, ao abrir este link, o Android pode pedir para permitir
@@ -75,9 +97,89 @@
     guardado em vez de ir buscar o novo.
   </div>
 
-  <!-- A lista de versões anteriores era mantida à mão aqui e ficava
-       incoerente sempre que um .apk era apagado do repositório (aconteceu
-       com o 1.3.0 e o 1.2.1). Passou a ser a página de Releases do GitHub,
-       que se mantém sozinha — ver o link "todas as versões" acima. -->
+  <h2>Todas as versões</h2>
+  <!-- Preenchido em runtime a partir da API do GitHub (repo público, CORS
+       aberto, 60 pedidos/hora por IP — de sobra para esta página). É o que
+       permite ter aqui a lista completa **sem** ter de editar este ficheiro e
+       pedir Redeploy no Coolify a cada release: as versões novas aparecem
+       sozinhas assim que a release é criada. -->
+  <div id="lista"><p class="estado">A carregar as versões…</p></div>
+
+  <script>
+    const REPO = 'msProjSoft/tasknotes-releases';
+    const lista = document.getElementById('lista');
+
+    // Um asset por release: o que tem a versão no nome (tasknotes-1.5.0.apk),
+    // não o `-latest` — nesta lista interessa saber qual se está a levar.
+    function apkVersionado(release) {
+      return (release.assets || []).find(
+        (a) => a.name.endsWith('.apk') && !a.name.includes('latest')
+      );
+    }
+
+    function formatarData(iso) {
+      try {
+        return new Date(iso).toLocaleDateString('pt-PT', {
+          year: 'numeric', month: 'long', day: 'numeric',
+        });
+      } catch (_) {
+        return '';
+      }
+    }
+
+    function alternativaManual() {
+      lista.innerHTML =
+        '<p class="estado">Não foi possível carregar a lista automaticamente. ' +
+        'Veja todas as versões em ' +
+        '<a href="https://github.com/' + REPO + '/releases">GitHub Releases</a>.</p>';
+    }
+
+    fetch('https://api.github.com/repos/' + REPO + '/releases')
+      .then((r) => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then((releases) => {
+        const comApk = releases.filter(apkVersionado);
+        if (comApk.length === 0) return alternativaManual();
+
+        lista.innerHTML = '';
+        comApk.forEach((release, i) => {
+          const apk = apkVersionado(release);
+          const item = document.createElement('div');
+          item.className = 'versao';
+
+          const num = document.createElement('span');
+          num.className = 'num';
+          num.textContent = release.tag_name;
+          item.appendChild(num);
+
+          if (i === 0) {
+            const badge = document.createElement('span');
+            badge.className = 'atual';
+            badge.textContent = 'ATUAL';
+            item.appendChild(badge);
+          }
+
+          const data = document.createElement('span');
+          data.className = 'data';
+          // `created_at` (data do commit que a tag aponta), não
+          // `published_at`: as releases 1.4.0/1.2.2 foram criadas
+          // retroativamente em 2026-07-28 e o `published_at` delas é essa
+          // data, não a data em que a versão saiu de facto.
+          data.textContent = formatarData(release.created_at);
+          item.appendChild(data);
+
+          const link = document.createElement('a');
+          link.className = 'baixar';
+          link.href = apk.browser_download_url;
+          link.textContent = 'Descarregar';
+          item.appendChild(link);
+
+          lista.appendChild(item);
+        });
+      })
+      .catch(alternativaManual);
+  </script>
 </body>
 </html>
