@@ -67,6 +67,24 @@
     }
     .versao .baixar { margin-left: auto; font-weight: 600; white-space: nowrap; }
     .estado { color: #9e8f78; font-size: 0.9rem; }
+    /* Passo-a-passo de instalação: <details> nativo, sem JS — abre/fecha
+       sozinho no browser. O <summary> é estilizado para parecer um botão
+       (secundário, sem o preenchimento dourado do download principal, para
+       não competir com ele). */
+    details.passos { margin: 0.5rem 0 1.5rem; }
+    details.passos summary {
+      cursor: pointer;
+      display: inline-block;
+      color: #ffdca1;
+      border: 1px solid #514532;
+      border-radius: 12px;
+      padding: 0.6rem 1.1rem;
+      font-weight: 600;
+    }
+    details.passos[open] summary { margin-bottom: 1rem; }
+    details.passos ol { padding-left: 1.3rem; }
+    details.passos li { margin-bottom: 0.7rem; }
+    details.passos li .sub { display: block; color: #9e8f78; font-size: 0.85rem; margin-top: 0.15rem; }
   </style>
 </head>
 <body>
@@ -89,6 +107,43 @@
     a instalação de "fontes desconhecidas" — é normal para apps distribuídas
     fora da Play Store.
   </p>
+
+  <details class="passos">
+    <summary>Como instalar, passo a passo</summary>
+    <ol>
+      <li>
+        Toque em "Descarregar a versão mais recente" acima e abra o
+        ficheiro <code>.apk</code> transferido (normalmente a partir da
+        notificação de download ou da pasta <em>Downloads</em>).
+      </li>
+      <li>
+        Se pedir para permitir instalar "fontes desconhecidas" para o
+        navegador ou gestor de ficheiros que usou, toque em
+        <strong>Definições</strong> e ative essa opção só para essa app.
+      </li>
+      <li>
+        Pode aparecer um aviso <strong>"App bloqueada para proteger o
+        dispositivo"</strong> (Google Play Protect). Toque em
+        <strong>"Mais detalhes"</strong> e depois em
+        <strong>"Instalar mesmo assim"</strong>.
+        <span class="sub">É normal — significa só que o Google ainda não
+        analisou esta versão em concreto, não que haja algum problema com
+        o ficheiro.</span>
+      </li>
+      <li>
+        Pode ainda perguntar se quer <strong>"Enviar esta app para a
+        Google para revisão"</strong>. Pode escolher
+        <strong>"Não enviar"</strong> — não afeta a instalação.
+      </li>
+      <li>A instalação prossegue normalmente a partir daqui.</li>
+    </ol>
+    <p class="alternativa">
+      Se o Android recusar instalar "por cima" de uma versão já existente
+      e pedir para desinstalar primeiro: isso apaga o código interno do
+      equipamento, por isso vai ser preciso colar uma licença nova em
+      <em>Ajustes → Licença</em> depois de reinstalar.
+    </p>
+  </details>
 
   <div class="nota">
     <strong>Se reinstalar e continuar a ver a versão antiga:</strong>
