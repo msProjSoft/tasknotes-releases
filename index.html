@@ -227,11 +227,18 @@
 
           const data = document.createElement('span');
           data.className = 'data';
-          // `created_at` (data do commit que a tag aponta), não
-          // `published_at`: as releases 1.4.0/1.2.2 foram criadas
-          // retroativamente em 2026-07-28 e o `published_at` delas é essa
-          // data, não a data em que a versão saiu de facto.
-          data.textContent = formatarData(release.created_at);
+          // `published_at`, não `created_at` (invertido em 2026-08-08):
+          // `created_at` de uma release do GitHub é a data do commit para
+          // onde a tag aponta, não a de quando a release foi criada — como
+          // a rotina normal de release nunca mexe neste repositório (só
+          // cria tags e anexa APKs), todas as releases desde 2026-08-07
+          // ficaram presas a essa mesma data, incluindo as futuras.
+          // `published_at` está correto para todas as versões reais; só as
+          // poucas releases retroativas de 2026-07-28 (1.4.0/1.2.2, criadas
+          // a partir de APKs já existentes) voltam a mostrar a data desse
+          // backfill em vez da data real da versão — limitação conhecida e
+          // aceite, já era assim antes da troca para `created_at`.
+          data.textContent = formatarData(release.published_at);
           item.appendChild(data);
 
           const link = document.createElement('a');
